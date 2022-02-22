@@ -27,7 +27,7 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * @Route(path="/add", name="add_customer", methods={"POST"})
+     * @Route(path="", name="add_customer", methods={"POST"})
      */
 
      public function addCustomer(Request $request): JsonResponse
@@ -44,14 +44,14 @@ class CustomerController extends AbstractController
 
          }
 
-         $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
-         return new JsonResponse(['status' => "Customer created!"], Response::HTTP_CREATED);
+         $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
+         return new JsonResponse(['status' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
      }
 
 
 
     /**
-     * @Route("/get/{id}", name="get_one_customer", methods={"GET"})
+     * @Route("/{id}", name="get_one_customer", methods={"GET"})
      */
     public function getOneCustomer($id): JsonResponse
     {
@@ -69,7 +69,7 @@ class CustomerController extends AbstractController
     }
 
        /**
-     * @Route("/get-all", name="get_all_customers", methods={"GET"})
+     * @Route("", name="get_all_customers", methods={"GET"})
      */
     public function getAllCustomers(): JsonResponse
     {
@@ -91,7 +91,7 @@ class CustomerController extends AbstractController
 
 
     /**
-     * @Route("/update/{id}", name="update_customer", methods={"PUT"})
+     * @Route("/{id}", name="update_customer", methods={"PUT"})
      */
     public function updateCustomer($id, Request $request): JsonResponse
     {
@@ -100,12 +100,12 @@ class CustomerController extends AbstractController
 
         $this->customerRepository->updateCustomer($customer, $data);
 
-        return new JsonResponse(['status' => 'customer updated!', "data"=>$data]);
+        return new JsonResponse(['status' => 'customer updated with id number '.$id, "data"=>$data]);
     }
 
 
     /**
-     * @Route("/delete/{id}", name="delete_customer", methods={"DELETE"})
+     * @Route("/{id}", name="delete_customer", methods={"DELETE"})
      */
     public function deleteCustomer($id): JsonResponse
     {
@@ -113,7 +113,7 @@ class CustomerController extends AbstractController
 
         $this->customerRepository->removeCustomer($customer);
 
-        return new JsonResponse(['status' => 'customer deleted']);
+        return new JsonResponse(['status' => 'customer deleted with id number '.$id]);
     }
 
 }

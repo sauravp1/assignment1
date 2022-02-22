@@ -38,6 +38,7 @@ class OrdersRepository extends ServiceEntityRepository
 
         $this->manager->persist($newOrder);
         $this->manager->flush();
+        return $newOrder->getId();
     }
     // /**
     //  * @return Orders[] Returns an array of Orders objects

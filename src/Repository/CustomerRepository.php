@@ -35,6 +35,8 @@ class CustomerRepository extends ServiceEntityRepository
 
         $this->manager->persist($newCustomer);
         $this->manager->flush();
+
+        return $newCustomer->getId();
     }
 
     public function updateCustomer(Customer $customer, $data)
