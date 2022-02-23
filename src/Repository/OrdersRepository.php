@@ -39,34 +39,7 @@ class OrdersRepository extends ServiceEntityRepository
         $this->manager->persist($newOrder);
         $this->manager->flush();
     }
-    // /**
-    //  * @return Orders[] Returns an array of Orders objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('o.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Orders
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+    
 
     public function removeOrder(Orders $order)
     {
@@ -76,12 +49,7 @@ class OrdersRepository extends ServiceEntityRepository
 
     public function updateOrder($order, $new_data) 
     {
-        // $customer_id = $data["customer_id"];
-        // $product_id = $data["product_id"];
-        // $price = $data["price"];
-        // $customer = $this->customerRepository->findOneBy(['id'=>$customer_id]);
-        // $product = $this->productRepository->findOneBy(['id'=>$product_id]);
-
+        
 
         empty($new_data['customer_id']) ? true : $order->setCustomerId($new_data['customer_id']);
         empty($new_data['product_id']) ? true : $order->setProductId($new_data['product_id']);
