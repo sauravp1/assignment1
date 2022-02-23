@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
 use App\Repository\OrdersRepository;
 Use App\Repository\ProductRepository;
 use App\Repository\CustomerRepository;
