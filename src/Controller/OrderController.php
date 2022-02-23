@@ -39,14 +39,14 @@ class OrderController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
        
-        $customer_id = $data["customer_id"];
-        $product_id = $data["product_id"];
+        $customerId = $data["customer_id"];
+        $productId = $data["product_id"];
         $price = $data["price"];
-        $customer = $this->customerRepository->findOneBy(['id'=>$customer_id]);
-        $product = $this->productRepository->findOneBy(['id'=>$product_id]);
+        $customer = $this->customerRepository->findOneBy(['id'=>$customerId]);
+        $product = $this->productRepository->findOneBy(['id'=>$productId]);
        
         
-        if (empty($customer_id) || empty($product_id) || empty($price) ){
+        if (empty($customerId) || empty($productId) || empty($price) ){
             throw new NotFoundHttpException("Expecting mandatory parameters:");
         }
         
@@ -61,12 +61,12 @@ class OrderController extends AbstractController
     public function getOneOrder($id): JsonResponse
     {
         $order = $this->orderRepository->findOneBy(['id' => $id]);
-        $customer_name = $order->getCustomerId()->getFirstName();
-        $product_name = $order->getProductId()->getName();
+        $customerName = $order->getCustomerId()->getFirstName();
+        $productName = $order->getProductId()->getName();
         $data = [
             'id' => $order->getId(),
-            'customer' => $customer_name,
-            'product' => $product_name,
+            'customer' => $customerName,
+            'product' => $productName,
             'price' => $order->getProductId()->getPrice(),
             
         ];

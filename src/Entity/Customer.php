@@ -132,7 +132,7 @@ class Customer
         return $this;
     }
 
-    public function removeOrd(Orders $order): self
+    public function removeOrder(Orders $order): self
     {
         if ($this->order->removeElement($order)) {
             if ($order->getCustomerId() === $this) {
