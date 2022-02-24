@@ -49,8 +49,6 @@ class OrdersRepository extends ServiceEntityRepository
 
     public function updateOrder($order, $new_data) 
     {
-        
-
         empty($new_data['customer_id']) ? true : $order->setCustomerId($new_data['customer_id']);
         empty($new_data['product_id']) ? true : $order->setProductId($new_data['product_id']);
         empty($new_data['price']) ? true : $order->setPrice($new_data['price']);

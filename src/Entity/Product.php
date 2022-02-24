@@ -102,7 +102,7 @@ class Product
         return $this;
     }
 
-    public function removeProd(Orders $product): self
+    public function removeProduct(Orders $product): self
     {
         if ($this->prod->removeElement($product)) {
             // set the owning side to null (unless already changed)
