@@ -33,7 +33,7 @@ class OrderController extends AbstractController
     
 
     /**
-     * @Route(path="/add", name="addorder", methods={"POST"})
+     * @Route(path="", name="addorder", methods={"POST"})
      */
     public function addOrder(Request $request) : JsonResponse
     {
@@ -57,12 +57,12 @@ class OrderController extends AbstractController
         }
         
         
-        $this->orderRepository->saveOrder($customer, $product);
-        return new JsonResponse(['status' => "order created!"], Response::HTTP_CREATED);
+        $id = $this->orderRepository->saveOrder($customer, $product);
+        return new JsonResponse(['message' => "order created with id number ".$id], Response::HTTP_CREATED);
     }
 
     /**
-     * @Route("/get/{id}", name="get_one_customer", methods={"GET"})
+     * @Route("/{id}", name="get_one_customer", methods={"GET"})
      */
     public function getOneOrder($id): JsonResponse
     {
@@ -81,20 +81,20 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="delete_order", methods={"DELETE"})
+     * @Route("/{id}", name="delete_order", methods={"DELETE"})
      */
     public function deleteOrder($id) : JsonResponse
     {
         $order = $this->orderRepository->findOneBy(['id'=>$id]);
         $this->orderRepository->removeOrder($order);
 
-        return new JsonResponse(["status:"=>"order deleted"]);
+        return new JsonResponse(["message"=>"order deleted with id number ".$id]);
 
 
     }
 
     /**
-     * @Route("/update/{id}", name="update_order", methods={"PUT"})
+     * @Route("/{id}", name="update_order", methods={"PUT"})
      */
     public function updateOrder($id, Request $request) :JsonResponse
     {
@@ -120,7 +120,6 @@ class OrderController extends AbstractController
 
         
         $this->orderRepository->updateOrder($order, $data);
-        $updated = $this->orderRepository->findOneBy(["id"=>$id]);
-        return new JsonResponse(["statcd us: "=> "Order updated"," updated data "=> $updated]);
+        return new JsonResponse(["message"=> "Order updated with id number ".$id]);
     }
 }
