@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Repository\CustomerRepository;
+use Doctrine\DBAL\Exception;
+use Error;
+use ErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 /**
  * Class CustomerSiteController
@@ -32,21 +36,30 @@ class CustomerController extends AbstractController
 
      public function addCustomer(Request $request): JsonResponse
      {
-         $data = json_decode($request->getContent(), true);
+        
+            $data = json_decode($request->getContent(), true);
+        
+            try {
+                $firstName = $data["firstName"];
+                $lastName = $data["lastName"];
+                $email = $data["email"];
+                $phoneNumber = $data["phoneNumber"];
+            } catch (ErrorException $e) {
+                return new JsonResponse(["message" => "Enter value for all field"], Response::HTTP_BAD_REQUEST);
+            }
 
-         $firstName = $data["firstName"];
-         $lastName = $data["lastName"];
-         $email = $data["email"];
-         $phoneNumber = $data["phoneNumber"];
+            if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber)){
+                throw new NotFoundHttpException("Expecting mandatory parameters:");
+            }
 
-         if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber)){
-             throw new NotFoundHttpException("Expecting mandatory parameters:");
+            $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
 
-         }
+            return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
+    
+     
 
-         $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
-         return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
-     }
+    }
+        
 
 
 
@@ -55,17 +68,27 @@ class CustomerController extends AbstractController
      */
     public function getOneCustomer($id): JsonResponse
     {
-        $customer = $this->customerRepository->findOneBy(['id' => $id]);
 
-        $data = [
-            'id' => $customer->getId(),
-            'firstName' => $customer->getFirstName(),
-            'lastName' => $customer->getLastName(),
-            'email' => $customer->getEmail(),
-            'phoneNumber' => $customer->getPhoneNumber(),
-        ];
+        try {
 
-        return new JsonResponse(['customer' => $data], Response::HTTP_OK);
+            $customer = $this->customerRepository->findOneBy(['id' => $id]);
+
+            if ($customer == null) {
+                return new JsonResponse(["message" => "Customer does not exist"]);
+            }
+    
+            $data = [
+                'id' => $customer->getId(),
+                'firstName' => $customer->getFirstName(),
+                'lastName' => $customer->getLastName(),
+                'email' => $customer->getEmail(),
+                'phoneNumber' => $customer->getPhoneNumber(),
+            ];
+    
+            return new JsonResponse(['customer' => $data], Response::HTTP_OK);
+        } catch(Exception $e){
+            return new JsonResponse([json_decode($e->getMessage())]);
+        }
     }
 
        /**
@@ -73,20 +96,24 @@ class CustomerController extends AbstractController
      */
     public function getAllCustomers(): JsonResponse
     {
-        $customers = $this->customerRepository->findAll();
-        $data = [];
-
-        foreach ($customers as $customer) {
-            $data[] = [
-                'id' => $customer->getId(),
-                'firstName' => $customer->getFirstName(),
-                'lastName' => $customer->getLastName(),
-                'email' => $customer->getEmail(),
-                'phoneNumber' => $customer->getPhoneNumber(),
-            ];
+        try {
+            $customers = $this->customerRepository->findAll();
+            $data = [];
+    
+            foreach ($customers as $customer) {
+                $data[] = [
+                    'id' => $customer->getId(),
+                    'firstName' => $customer->getFirstName(),
+                    'lastName' => $customer->getLastName(),
+                    'email' => $customer->getEmail(),
+                    'phoneNumber' => $customer->getPhoneNumber(),
+                ];
+            }
+    
+            return new JsonResponse(['customers' => $data], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return new JsonResponse(["message" => $e->getMessage()]);
         }
-
-        return new JsonResponse(['customers' => $data], Response::HTTP_OK);
     }
 
 
@@ -95,12 +122,22 @@ class CustomerController extends AbstractController
      */
     public function updateCustomer($id, Request $request): JsonResponse
     {
-        $customer = $this->customerRepository->findOneBy(['id' => $id]);
-        $data = json_decode($request->getContent(), true);
+        try {
 
-        $this->customerRepository->updateCustomer($customer, $data);
+            $customer = $this->customerRepository->findOneBy(['id' => $id]);
+            $data = json_decode($request->getContent(), true);
 
-        return new JsonResponse(['message' => 'customer updated with id number '.$id, "data"=>$data]);
+            if ($customer == null){
+                return new JsonResponse(["message" => "Customer does not exist."]);
+            }
+    
+            $this->customerRepository->updateCustomer($customer, $data);
+    
+            return new JsonResponse(['message' => 'customer updated with id number '.$id, "data"=>$data]);
+
+        } catch (Exception $e) {
+            return new JsonResponse(["message" => $e->getMessage()]);
+        }
     }
 
 
@@ -109,11 +146,21 @@ class CustomerController extends AbstractController
      */
     public function deleteCustomer($id): JsonResponse
     {
-        $customer = $this->customerRepository->findOneBy(['id' => $id]);
+        try {
 
-        $this->customerRepository->removeCustomer($customer);
+            $customer = $this->customerRepository->findOneBy(['id' => $id]);
 
-        return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
+            if ($customer == null){
+                return new JsonResponse((["message" => "Customer does not exist."]));
+            }
+    
+            $this->customerRepository->removeCustomer($customer);
+    
+            return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
+        
+        } catch (Exception $e) {
+            return new JsonResponse(["message" => $e->getMessage()]);
+        }
     }
 
 }
