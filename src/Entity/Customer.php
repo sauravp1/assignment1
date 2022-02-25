@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -42,11 +41,11 @@ class Customer
     /**
      * @ORM\OneToMany(targetEntity=Orders::class, mappedBy="customer_id", orphanRemoval=true)
      */
-    private $ord;
+    private $order;
 
     public function __construct()
     {
-        $this->ord = new ArrayCollection();
+        $this->order = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -117,27 +116,26 @@ class Customer
     /**
      * @return Collection<int, Orders>
      */
-    public function getOrd(): Collection
+    public function getOrder(): Collection
     {
-        return $this->ord;
+        return $this->order;
     }
 
-    public function addOrd(Orders $ord): self
+    public function addOrder(Orders $order): self
     {
-        if (!$this->ord->contains($ord)) {
-            $this->ord[] = $ord;
-            $ord->setCustomerId($this);
+        if (!$this->order->contains($order)) {
+            $this->order[] = $order;
+            $order->setCustomerId($this);
         }
 
         return $this;
     }
 
-    public function removeOrd(Orders $ord): self
+    public function removeOrder(Orders $order): self
     {
-        if ($this->ord->removeElement($ord)) {
-            // set the owning side to null (unless already changed)
-            if ($ord->getCustomerId() === $this) {
-                $ord->setCustomerId(null);
+        if ($this->order->removeElement($order)) {
+            if ($order->getCustomerId() === $this) {
+                $order->setCustomerId(null);
             }
         }
 

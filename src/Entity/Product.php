@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,7 +36,7 @@ class Product
     /**
      * @ORM\OneToMany(targetEntity=Orders::class, mappedBy="product_id", orphanRemoval=true)
      */
-    private $prod;
+    private $product;
 
     public function __construct()
     {
@@ -88,27 +87,27 @@ class Product
     /**
      * @return Collection<int, Orders>
      */
-    public function getProd(): Collection
+    public function getProduct(): Collection
     {
-        return $this->prod;
+        return $this->product;
     }
 
-    public function addProd(Orders $prod): self
+    public function addProduct(Orders $product): self
     {
-        if (!$this->prod->contains($prod)) {
-            $this->prod[] = $prod;
-            $prod->setProductId($this);
+        if (!$this->product->contains($product)) {
+            $this->product[] = $product;
+            $product->setProductId($this);
         }
 
         return $this;
     }
 
-    public function removeProd(Orders $prod): self
+    public function removeProduct(Orders $product): self
     {
-        if ($this->prod->removeElement($prod)) {
+        if ($this->prod->removeElement($product)) {
             // set the owning side to null (unless already changed)
-            if ($prod->getProductId() === $this) {
-                $prod->setProductId(null);
+            if ($product->getProductId() === $this) {
+                $product->setProductId(null);
             }
         }
 
