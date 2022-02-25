@@ -58,7 +58,7 @@ class OrderController extends AbstractController
         
         
         $id = $this->orderRepository->saveOrder($customer, $product);
-        return new JsonResponse(['status' => "order created with id number ".$id], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => "order created with id number ".$id], Response::HTTP_CREATED);
     }
 
     /**
@@ -88,7 +88,7 @@ class OrderController extends AbstractController
         $order = $this->orderRepository->findOneBy(['id'=>$id]);
         $this->orderRepository->removeOrder($order);
 
-        return new JsonResponse(["status:"=>"order deleted with id number ".$id]);
+        return new JsonResponse(["message"=>"order deleted with id number ".$id]);
 
 
     }
@@ -120,6 +120,6 @@ class OrderController extends AbstractController
 
         
         $this->orderRepository->updateOrder($order, $data);
-        return new JsonResponse(["status: "=> "Order updated with id number ".$id]);
+        return new JsonResponse(["message"=> "Order updated with id number ".$id]);
     }
 }

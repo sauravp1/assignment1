@@ -45,7 +45,7 @@ class CustomerController extends AbstractController
          }
 
          $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
-         return new JsonResponse(['status' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
+         return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
      }
 
 
@@ -100,7 +100,7 @@ class CustomerController extends AbstractController
 
         $this->customerRepository->updateCustomer($customer, $data);
 
-        return new JsonResponse(['status' => 'customer updated with id number '.$id, "data"=>$data]);
+        return new JsonResponse(['message' => 'customer updated with id number '.$id, "data"=>$data]);
     }
 
 
@@ -113,7 +113,7 @@ class CustomerController extends AbstractController
 
         $this->customerRepository->removeCustomer($customer);
 
-        return new JsonResponse(['status' => 'customer deleted with id number '.$id]);
+        return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
     }
 
 }
