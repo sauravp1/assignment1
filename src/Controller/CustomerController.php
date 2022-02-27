@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Repository\CustomerRepository;
+use ErrorException;
+use JsonException;
+use PDOException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,18 +37,26 @@ class CustomerController extends AbstractController
      {
          $data = json_decode($request->getContent(), true);
 
-         $firstName = $data["firstName"];
-         $lastName = $data["lastName"];
-         $email = $data["email"];
-         $phoneNumber = $data["phoneNumber"];
+         try {
 
-         if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber)){
-             throw new NotFoundHttpException("Expecting mandatory parameters:");
+             $firstName = $data["firstName"];
+             $lastName = $data["lastName"];
+             $email = $data["email"];
+             $phoneNumber = $data["phoneNumber"];
 
-         }
+             $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
 
-         $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
-         return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
+             return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
+
+         } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+
+             return new JsonResponse(["Error message" => "Enter valid arguments."]);
+
+         } catch (ErrorException $e) {
+
+            return new JsonResponse(["Error message" => "Enter valid arguments"]);
+ 
+        }
      }
 
 
@@ -56,6 +67,11 @@ class CustomerController extends AbstractController
     public function getOneCustomer($id): JsonResponse
     {
         $customer = $this->customerRepository->findOneBy(['id' => $id]);
+
+        if (is_null($customer)) {
+
+            return new JsonResponse(["Error message" => "Customer Not found"]);
+        }
 
         $data = [
             'id' => $customer->getId(),
@@ -96,6 +112,12 @@ class CustomerController extends AbstractController
     public function updateCustomer($id, Request $request): JsonResponse
     {
         $customer = $this->customerRepository->findOneBy(['id' => $id]);
+
+        if (is_null($customer)){
+
+            return new JsonResponse(["Error message" => "Customer not found"]);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $this->customerRepository->updateCustomer($customer, $data);
@@ -110,6 +132,11 @@ class CustomerController extends AbstractController
     public function deleteCustomer($id): JsonResponse
     {
         $customer = $this->customerRepository->findOneBy(['id' => $id]);
+
+        if (is_null($customer)) {
+
+            return new JsonResponse(["Error message" => "Customer Not Found"]);
+        }
 
         $this->customerRepository->removeCustomer($customer);
 
