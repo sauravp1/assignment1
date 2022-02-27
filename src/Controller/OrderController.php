@@ -27,8 +27,7 @@ class OrderController extends AbstractController
     {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
-        $this->customerRepository = $customerRepository;
-        
+        $this->customerRepository = $customerRepository;     
     }
     
     /**
@@ -112,7 +111,7 @@ class OrderController extends AbstractController
         if (is_null($order)) {
 
             return new JsonResponse(["Error message" => "Order not found"]);
-
+          
         }
 
         $data = json_decode($request->getContent(), true);
