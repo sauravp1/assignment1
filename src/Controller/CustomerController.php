@@ -30,7 +30,11 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * Adding new customer to database
      * @Route(path="", name="add_customer", methods={"POST"})
+     * 
+     * @param Request $request
+     * @return JsonResponse
      */
 
      public function addCustomer(Request $request): JsonResponse
@@ -59,10 +63,12 @@ class CustomerController extends AbstractController
         }
      }
 
-
-
     /**
+     * Get information about single customer 
      * @Route("/{id}", name="get_one_customer", methods={"GET"})
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function getOneCustomer($id): JsonResponse
     {
@@ -84,8 +90,11 @@ class CustomerController extends AbstractController
         return new JsonResponse(['customer' => $data], Response::HTTP_OK);
     }
 
-       /**
+    /**
+     * Get list of all customers
      * @Route("", name="get_all_customers", methods={"GET"})
+     * 
+     * @return JsonResponse
      */
     public function getAllCustomers(): JsonResponse
     {
@@ -101,13 +110,16 @@ class CustomerController extends AbstractController
                 'phoneNumber' => $customer->getPhoneNumber(),
             ];
         }
-
         return new JsonResponse(['customers' => $data], Response::HTTP_OK);
     }
 
 
     /**
+     * Update information about customer
      * @Route("/{id}", name="update_customer", methods={"PUT"})
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function updateCustomer($id, Request $request): JsonResponse
     {
@@ -127,7 +139,11 @@ class CustomerController extends AbstractController
 
 
     /**
+     * Delete customer from database
      * @Route("/{id}", name="delete_customer", methods={"DELETE"})
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function deleteCustomer($id): JsonResponse
     {
@@ -142,7 +158,5 @@ class CustomerController extends AbstractController
 
         return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
     }
-
 }
-
 ?>

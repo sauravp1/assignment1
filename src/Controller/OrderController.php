@@ -27,13 +27,15 @@ class OrderController extends AbstractController
     {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
-        $this->customerRepository = $customerRepository;
-        
+        $this->customerRepository = $customerRepository; 
     }
     
-
     /**
+     * Add orders information in database
      * @Route(path="", name="addorder", methods={"POST"})
+     * 
+     * @param Request $request
+     * @return JsonResponse
      */
     public function addOrder(Request $request) : JsonResponse
     {
@@ -62,7 +64,11 @@ class OrderController extends AbstractController
     }
 
     /**
+     * Get information about order using order id
      * @Route("/{id}", name="get_one_customer", methods={"GET"})
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function getOneOrder($id): JsonResponse
     {   
@@ -86,7 +92,11 @@ class OrderController extends AbstractController
     }
 
     /**
+     * Delete order information
      * @Route("/{id}", name="delete_order", methods={"DELETE"})
+     * 
+     * @param int $id
+     * @param JsonResponse
      */
     public function deleteOrder($id) : JsonResponse
     {
@@ -95,18 +105,21 @@ class OrderController extends AbstractController
         if (is_null($order)) {
 
             return new JsonResponse(["Error message" => "Order not found"]);
-
         }
 
         $this->orderRepository->removeOrder($order);
 
         return new JsonResponse(["message"=>"order deleted with id number ".$id]);
-
-
     }
 
     /**
+     * Update order information
      * @Route("/{id}", name="update_order", methods={"PUT"})
+     * 
+     * @param Request $request
+     * @param int $id
+     * 
+     * @return JsonResponse
      */
     public function updateOrder($id, Request $request) :JsonResponse
     {
@@ -115,7 +128,6 @@ class OrderController extends AbstractController
         if (is_null($order)) {
 
             return new JsonResponse(["Error message" => "Order not found"]);
-
         }
 
         $data = json_decode($request->getContent(), true);
