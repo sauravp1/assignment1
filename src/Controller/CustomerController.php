@@ -3,16 +3,12 @@
 namespace App\Controller;
 
 use App\Repository\CustomerRepository;
-use Doctrine\DBAL\Exception;
-use Error;
 use ErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Throwable;
 
 /**
  * Class CustomerSiteController
@@ -36,59 +32,51 @@ class CustomerController extends AbstractController
 
      public function addCustomer(Request $request): JsonResponse
      {
-        
-            $data = json_decode($request->getContent(), true);
-        
-            try {
-                $firstName = $data["firstName"];
-                $lastName = $data["lastName"];
-                $email = $data["email"];
-                $phoneNumber = $data["phoneNumber"];
-            } catch (ErrorException $e) {
-                return new JsonResponse(["message" => "Enter value for all field"], Response::HTTP_BAD_REQUEST);
-            }
+         $data = json_decode($request->getContent(), true);
 
-            if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber)){
-                throw new NotFoundHttpException("Expecting mandatory parameters:");
-            }
+         try {
 
-            $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
+             $firstName = $data["firstName"];
+             $lastName = $data["lastName"];
+             $email = $data["email"];
+             $phoneNumber = $data["phoneNumber"];
 
-            return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
-    
-     
+             $id = $this->customerRepository->saveCustomer($firstName, $lastName, $email, $phoneNumber);
 
-    }
-        
+             return new JsonResponse(['message' => "Customer created with id number {$id}"], Response::HTTP_CREATED);
 
+         } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
 
+             return new JsonResponse(["Error message" => "Enter valid arguments."]);
+
+         } catch (ErrorException $e) {
+
+            return new JsonResponse(["Error message" => "Enter valid arguments"]);
+ 
+        }
+     }
 
     /**
      * @Route("/{id}", name="get_one_customer", methods={"GET"})
      */
     public function getOneCustomer($id): JsonResponse
     {
+        $customer = $this->customerRepository->findOneBy(['id' => $id]);
 
-        try {
+        if (is_null($customer)) {
 
-            $customer = $this->customerRepository->findOneBy(['id' => $id]);
-
-            if ($customer == null) {
-                return new JsonResponse(["message" => "Customer does not exist"]);
-            }
-    
-            $data = [
-                'id' => $customer->getId(),
-                'firstName' => $customer->getFirstName(),
-                'lastName' => $customer->getLastName(),
-                'email' => $customer->getEmail(),
-                'phoneNumber' => $customer->getPhoneNumber(),
-            ];
-    
-            return new JsonResponse(['customer' => $data], Response::HTTP_OK);
-        } catch(Exception $e){
-            return new JsonResponse([json_decode($e->getMessage())]);
+            return new JsonResponse(["Error message" => "Customer Not found"]);
         }
+
+        $data = [
+            'id' => $customer->getId(),
+            'firstName' => $customer->getFirstName(),
+            'lastName' => $customer->getLastName(),
+            'email' => $customer->getEmail(),
+            'phoneNumber' => $customer->getPhoneNumber(),
+        ];
+
+        return new JsonResponse(['customer' => $data], Response::HTTP_OK);
     }
 
        /**
@@ -96,73 +84,56 @@ class CustomerController extends AbstractController
      */
     public function getAllCustomers(): JsonResponse
     {
-        try {
-            $customers = $this->customerRepository->findAll();
-            $data = [];
-    
-            foreach ($customers as $customer) {
-                $data[] = [
-                    'id' => $customer->getId(),
-                    'firstName' => $customer->getFirstName(),
-                    'lastName' => $customer->getLastName(),
-                    'email' => $customer->getEmail(),
-                    'phoneNumber' => $customer->getPhoneNumber(),
-                ];
-            }
-    
-            return new JsonResponse(['customers' => $data], Response::HTTP_OK);
-        } catch (Exception $e) {
-            return new JsonResponse(["message" => $e->getMessage()]);
-        }
-    }
+        $customers = $this->customerRepository->findAll();
+        $data = [];
 
+        foreach ($customers as $customer) {
+            $data[] = [
+                'id' => $customer->getId(),
+                'firstName' => $customer->getFirstName(),
+                'lastName' => $customer->getLastName(),
+                'email' => $customer->getEmail(),
+                'phoneNumber' => $customer->getPhoneNumber(),
+            ];
+        }
+
+        return new JsonResponse(['customers' => $data], Response::HTTP_OK);
+    }
 
     /**
      * @Route("/{id}", name="update_customer", methods={"PUT"})
      */
     public function updateCustomer($id, Request $request): JsonResponse
     {
-        try {
+        $customer = $this->customerRepository->findOneBy(['id' => $id]);
 
-            $customer = $this->customerRepository->findOneBy(['id' => $id]);
-            $data = json_decode($request->getContent(), true);
+        if (is_null($customer)){
 
-            if ($customer == null){
-                return new JsonResponse(["message" => "Customer does not exist."]);
-            }
-    
-            $this->customerRepository->updateCustomer($customer, $data);
-    
-            return new JsonResponse(['message' => 'customer updated with id number '.$id, "data"=>$data]);
-
-        } catch (Exception $e) {
-            return new JsonResponse(["message" => $e->getMessage()]);
+            return new JsonResponse(["Error message" => "Customer not found"]);
         }
-    }
 
+        $data = json_decode($request->getContent(), true);
+
+        $this->customerRepository->updateCustomer($customer, $data);
+
+        return new JsonResponse(['message' => 'customer updated with id number '.$id, "data"=>$data]);
+    }
 
     /**
      * @Route("/{id}", name="delete_customer", methods={"DELETE"})
      */
     public function deleteCustomer($id): JsonResponse
     {
-        try {
+        $customer = $this->customerRepository->findOneBy(['id' => $id]);
 
-            $customer = $this->customerRepository->findOneBy(['id' => $id]);
+        if (is_null($customer)) {
 
-            if ($customer == null){
-                return new JsonResponse((["message" => "Customer does not exist."]));
-            }
-    
-            $this->customerRepository->removeCustomer($customer);
-    
-            return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
-        
-        } catch (Exception $e) {
-            return new JsonResponse(["message" => $e->getMessage()]);
+            return new JsonResponse(["Error message" => "Customer Not Found"]);
         }
+
+        $this->customerRepository->removeCustomer($customer);
+
+        return new JsonResponse(['message' => 'customer deleted with id number '.$id]);
     }
-
 }
-
 ?>
