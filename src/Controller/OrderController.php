@@ -31,7 +31,11 @@ class OrderController extends AbstractController
     }
     
     /**
+     * Add orders information in database
      * @Route(path="", name="addorder", methods={"POST"})
+     * 
+     * @param Request $request
+     * @return JsonResponse
      */
     public function addOrder(Request $request) : JsonResponse
     {
@@ -60,7 +64,11 @@ class OrderController extends AbstractController
     }
 
     /**
+     * Get information about order using order id
      * @Route("/{id}", name="get_one_customer", methods={"GET"})
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function getOneOrder($id): JsonResponse
     {   
@@ -84,7 +92,11 @@ class OrderController extends AbstractController
     }
 
     /**
+     * Delete order information
      * @Route("/{id}", name="delete_order", methods={"DELETE"})
+     * 
+     * @param int $id
+     * @param JsonResponse
      */
     public function deleteOrder($id) : JsonResponse
     {
@@ -102,7 +114,13 @@ class OrderController extends AbstractController
     }
 
     /**
+     * Update order information
      * @Route("/{id}", name="update_order", methods={"PUT"})
+     * 
+     * @param Request $request
+     * @param int $id
+     * 
+     * @return JsonResponse
      */
     public function updateOrder($id, Request $request) :JsonResponse
     {
@@ -110,8 +128,8 @@ class OrderController extends AbstractController
 
         if (is_null($order)) {
 
-            return new JsonResponse(["Error message" => "Order not found"]);
-          
+            return new JsonResponse(["Error message" => "Order not found"]);          
+
         }
 
         $data = json_decode($request->getContent(), true);
