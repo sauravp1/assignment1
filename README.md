@@ -1,7 +1,11 @@
 
 # Assignment1
 
-A basic php symfony crud applications.
+A basic php symfony application to demonstrate CRUD operations.
+
+## What does it do?
+- Create, Update, Read or Remove Customer Info
+- Create, Update, Read or Remove Order Info
 
 ## API Reference
 
